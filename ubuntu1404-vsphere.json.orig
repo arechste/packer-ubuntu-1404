@@ -1,4 +1,15 @@
 {
+ "variables": {
+       "remote_host": "192.168.50.28",
+       "myhost": "ubuntu01",
+       "mydomain": "dsdemo.local",
+       "myip": "192.168.50.180",
+       "mygw": "192.168.50.254",
+       "mymask": "255.255.255.0",
+       "mydns1": "192.168.50.50",
+       "mydns2": "192.168.50.51",
+       "mydatastore": "dssrv01.local"
+       },
   "provisioners": [
     {
       "type": "shell",
@@ -25,56 +36,16 @@
   ],
   "builders": [
     {
-      "type": "virtualbox-iso",
-      "boot_command": [
-        "<esc><wait>",
-        "<esc><wait>",
-        "<enter><wait>",
-        "/install/vmlinuz",
-        " auto=true",
-        " priority=critical",
-        " initrd=/install/initrd.gz",
-        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
-        " -- ",
-        "<enter>"
-      ],
-      "boot_wait": "10s",
-      "disk_size": 81920,
-      "guest_os_type": "Ubuntu_64",
-      "headless": true,
-      "http_directory": "http",
-      "iso_urls": [
-        "iso/ubuntu-14.04.4-server-amd64.iso",
-        "http://releases.ubuntu.com/14.04/ubuntu-14.04.4-server-amd64.iso"
-      ],
-      "iso_checksum_type": "md5",
-      "iso_checksum": "2ac1f3e0de626e54d05065d6f549fa3a",
-      "ssh_username": "vagrant",
-      "ssh_password": "vagrant",
-      "ssh_port": 22,
-      "ssh_wait_timeout": "10000s",
-      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
-      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
-      "virtualbox_version_file": ".vbox_version",
-      "vm_name": "packer-ubuntu-14.04-amd64",
-      "vboxmanage": [
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--memory",
-          "512"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--cpus",
-          "2"
-        ]
-      ]
-    },
-    {
       "type": "vmware-iso",
       "boot_command": [
+      "<tab>",
+       "myhostname={{user `myhost`}} ",
+       "mydomain={{user `mydomain`}} ",
+       "myip={{user `myip`}} ",
+       "mygateway={{user `mygw`}} ",
+       "mynetmask={{user `mymask`}} ",
+       "mydns1={{user `mydns1`}} ",
+       "mydns2={{user `mydns2`}} ",
         "<esc><wait>",
         "<esc><wait>",
         "<enter><wait>",
@@ -87,8 +58,8 @@
         "<enter>"
       ],
       "boot_wait": "10s",
-      "disk_size": 81920,
-      "guest_os_type": "Ubuntu-64",
+      "disk_size": 8192,
+      "guest_os_type": "ubuntu-64",
       "headless": true,
       "http_directory": "http",
       "iso_urls": [
@@ -104,11 +75,17 @@
       "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "linux",
-      "vm_name": "packer-ubuntu-14.04-amd64",
+      "vm_name": "ubuntu01",
       "vmx_data": {
-        "cpuid.coresPerSocket": "1",
-        "memsize": "512",
-        "numvcpus": "2"
+      "ethernet0.networkName": "VM Network",
+      "ethernet0.present": "TRUE",
+      "ethernet0.virtualDev": "vmxnet3",
+      "cpuid.coresPerSocket": "1",
+      "memsize": "512",
+      "numvcpus": "2",
+      "scsi0:0.fileName": "disk.vmdk",
+      "scsi0:0.present": "TRUE",
+      "scsi0:0.redo": ""
       }
     }
   ],
@@ -116,6 +93,20 @@
     {
       "output": "builds/{{.Provider}}-ubuntu1404.box",
       "type": "vagrant"
-    }
+    },
+    {
+      "type": "vsphere",
+      "host": "dsvcappl01.dsdemo.local",
+      "username": "administrator@vsphere.local",
+      "password": "DS-dem0.",
+      "datacenter": "DSDEMO-MAIN",
+      "cluster": "DSDEMO-MGMT",
+      "resource_pool": " ",
+      "datastore": "{{user `mydatastore`}}",
+      "vm_folder": "UBUNTU-PACKER",
+      "vm_name": "{{user `myhost`}}",
+      "vm_network": "VM Network",
+      "insecure" : "true"
+     }
   ]
 }
