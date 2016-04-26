@@ -115,7 +115,12 @@
   "post-processors": [
     {
       "output": "builds/{{.Provider}}-ubuntu1404.box",
-      "type": "vagrant"
+      "type": "vagrant",
+      "keep_input_artifact": true
+    },
+    {
+      "type": "compress",
+      "keep_input_artifact": true
     }
   ]
 }

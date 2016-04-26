@@ -106,6 +106,10 @@
       "vm_name": "{{user `myhost`}}",
       "vm_network": "VM Network",
       "insecure" : "true"
+     },
+     {
+       "type": "vmware-ova",
+       "output": "builds/{{.Provider}}-ubuntu1404.ova"
      }
   ]
 }
